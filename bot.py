@@ -211,7 +211,7 @@ class ChrisReddit:
 		reddit_old = self.reddit_time+36000
 		
 		if reddit_old < reddit_current:
-			self.reddit_time = feedparser.parse('https://www.reddit.com/r/{}/top/.rss?sort=top&t=week'.format(self.reddit_sub))
+			self.reddit_feed = feedparser.parse('https://www.reddit.com/r/{}/top/.rss?sort=top&t=week'.format(self.reddit_sub))
 			self.reddit_time  = reddit_current
 		
 		reddit_rng = math.floor(random.random()*len(self.reddit_feed.entries))
