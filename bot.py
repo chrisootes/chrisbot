@@ -128,7 +128,8 @@ class ChrisPlayer(threading.Thread):
 				self.event_next.clear()
 				
 			else:
-				print('Wrong header2: ' + header2)
+				print('Wrong header2: ')
+				print(header2)
 				self.event_next.clear()
 				continue
 			
@@ -223,12 +224,13 @@ class ChrisReddit:
 		return(reddit_link)
 		
 class ChrisCommands:
-	"""Chris commands for a bot."""
+	"""
+	Chris commands for a bot.
+	https://github.com/chrisootes/chrisbot
+	"""
 	def __init__(self, bot):
 		self.bot = bot
-		
 		self.player = None
-		
 		self.reddit = {}
 		
 	@commands.command(pass_context=True)
