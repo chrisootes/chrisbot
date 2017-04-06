@@ -172,42 +172,9 @@ class ChrisPlayer(threading.Thread):
 		return str(skipper_amount) + ' skippers out of ' + str(skipper_needed)
 
 	def add(self, song, requester):
-		if len(song) > 20:
-			return('Wrong song link')
-
-		file_youtube = song + '.webm'
-		print('Checking ' + file_youtube)
-		path_youtube = Path(file_youtube)
-
-		if not path_youtube.is_file():
-			ydl_opts = {'format': '251/250/249', 'output': file_youtube}
-
-		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-			song_info = ydl.extract_info(song_link, download=False)
-			song_url = song_info.get('url', None)
-			song_title = song_info.get('title', None)
-			song_id = song_info.get('id', None)
-			song_duration = song_info.get('duration', None)
-
-		if song_duration < 600:
-			urllib.request.urlretrieve(song_url, file_youtube)
-		else:
-			return('Song {}, by: {} is too long'.format(song_title, requester))
-
-		file_opus = file_youtube + '.opus'
-		print('Checking ' + file_opus)
-		path_opus = Path(file_opus)
-
-		if not path_opus.is_file():
-			command = ['mkvextract', 'tracks', file_youtube, '0:' + file_opus]
-			succes = subprocess.run(command)
-			print(succes)
-
-		self.list_song.append(path_opus)
+		self.list_song.append(song)
 		self.list_requester.append(requester)
 		self.event_next.set()
-
-		return('Added song {}, by: {}'.format(song_title, requester))
 
 class ChrisReddit:
 	def __init__(self, subredit):
@@ -296,8 +263,48 @@ class ChrisCommands:
 			#if not success:
 				#return
 
-		succes = self.player.add(song,ctx.message.author)
-		await self.bot.say(succes)
+		if len(song) > 20:
+			return('Wrong song link')
+
+		file_youtube = song + '.webm'
+		print('Checking ' + file_youtube)
+		path_youtube = Path(file_youtube)
+
+		if not path_youtube.is_file():
+			ydl_opts = {'format': '251/250/249', 'output': file_youtube}
+
+		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+			try:
+				song_info = ydl.extract_info(song_link, download=False)
+			except Exception as e:
+				print(e)
+				return('Youtube part fucked up mate')
+			song_url = song_info.get('url', None)
+			song_title = song_info.get('title', None)
+			song_id = song_info.get('id', None)
+			song_duration = song_info.get('duration', None)
+
+		if song_duration < 600:
+			try:
+				urllib.request.urlretrieve(song_url, file_youtube)
+			except Exception as e:
+				print(e)
+				return('Youtube part fucked up mate')
+		else:
+			return('Song {}, by: {} is too long'.format(song_title, requester))
+
+		file_opus = file_youtube + '.opus'
+		print('Checking ' + file_opus)
+		path_opus = Path(file_opus)
+
+		if not path_opus.is_file():
+			command = ['mkvextract', 'tracks', file_youtube, '0:' + file_opus]
+			succes = subprocess.run(command)
+			print(succes)
+
+		self.player.add(path_opus, ctx.message.author)
+
+		await self.bot.say('Added song {}, by: {}'.format(song_title, requester))
 
 	@commands.command(pass_context=True)
 	async def stop(self, ctx):
