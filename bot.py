@@ -274,11 +274,7 @@ class ChrisCommands:
 			ydl_opts = {'format': '251/250/249', 'output': file_youtube}
 
 		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-			try:
-				song_info = ydl.extract_info(song_link, download=False)
-			except Exception as e:
-				print(e)
-				return('Youtube part fucked up mate')
+			song_info = ydl.extract_info(song_link, download=False)
 			song_url = song_info.get('url', None)
 			song_title = song_info.get('title', None)
 			song_id = song_info.get('id', None)
