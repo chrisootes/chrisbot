@@ -273,21 +273,25 @@ class ChrisCommands:
 		if not path_youtube.is_file():
 			ydl_opts = {'format': '251/250/249', 'output': file_youtube}
 
-		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-			song_info = ydl.extract_info(song_link, download=False)
+			try:
+				song_info = youtube_dl.YoutubeDL(ydl_opts).extract_info(song_link, download=False)
+			except Exception as e:
+				print(e)
+				return('Youtube part fucked up mate')
+				
 			song_url = song_info.get('url', None)
 			song_title = song_info.get('title', None)
 			song_id = song_info.get('id', None)
 			song_duration = song_info.get('duration', None)
 
-		if song_duration < 600:
-			try:
-				urllib.request.urlretrieve(song_url, file_youtube)
-			except Exception as e:
-				print(e)
-				return('Youtube part fucked up mate')
-		else:
-			return('Song {}, by: {} is too long'.format(song_title, requester))
+			if song_duration < 600:
+				try:
+					urllib.request.urlretrieve(song_url, file_youtube)
+				except Exception as e:
+					print(e)
+					return('Youtube part fucked up mate')
+			else:
+				return('Song {}, by: {} is too long'.format(song_title, requester))
 
 		file_opus = file_youtube + '.opus'
 		print('Checking ' + file_opus)
