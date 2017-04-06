@@ -63,7 +63,7 @@ class ChrisPlayer(threading.Thread):
 				f = open(song_file, 'rb')
 				stream = io.BytesIO(f.read())
 				f.close
-				print('Playing ' + str(song_file) + song_requester)
+				print('Playing ' + str(song_file) + str(song_requester))
 
 				self.time_start = time.time()
 				self.time_loops = 0
