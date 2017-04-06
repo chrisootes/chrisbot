@@ -294,7 +294,7 @@ class ChrisCommands:
 					return
 
 			else:
-				await self.bot.say('Song {}, by: {} is too long'.format(song_title, requester))
+				await self.bot.say('Song {}, by: {} is too long'.format(song_title, str(ctx.message.author)))
 				return
 
 		else:
@@ -311,7 +311,7 @@ class ChrisCommands:
 
 		self.player.add(path_opus, ctx.message.author)
 
-		await self.bot.say('Added song {}, by: {}'.format(song_title, requester))
+		await self.bot.say('Added song {}, by: {}'.format(song_title, str(ctx.message.author)))
 
 	@commands.command(pass_context=True)
 	async def stop(self, ctx):
