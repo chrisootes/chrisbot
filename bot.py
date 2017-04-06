@@ -130,10 +130,11 @@ class ChrisPlayer(threading.Thread):
 					#print(delay)
 					time.sleep(delay)
 
+		self.voice.disconnect()
+
 	def stop(self):
 		self.event_end.set()
 		self.event_next.clear()
-		self.voice.disconnect()
 
 	def skip(self, skipper):
 		for already in self.list_skippers:
