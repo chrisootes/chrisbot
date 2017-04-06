@@ -151,7 +151,7 @@ class ChrisPlayer(threading.Thread):
 					self.time_loops += 1
 					packet_size += lacing
 					packet = stream.read(packet_size)
-					if header > 2:
+					if self.header > 2:
 						self.voice.play_audio(packet, encode=False)
 
 					else:
