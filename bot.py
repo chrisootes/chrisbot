@@ -41,9 +41,9 @@ class ChrisPlayer(threading.Thread):
 		self.time_loops = 0
 		self.time_start = 0
 
-	def run(self):
-		self.time_start = time.time()
+		self.header = 0
 
+	def run(self):
 		while not self.event_end.is_set():
 			#print(self.time_loops)
 			if not self.event_next.is_set():
@@ -97,20 +97,22 @@ class ChrisPlayer(threading.Thread):
 				stream = io.BytesIO(f.read())
 				f.close
 				print('Playing ' + str(song_link))
-				header = 0
+
+				self.time_start = time.time()
+				self.time_loops = 0
+				self.header = 0
 
 			header1 = stream.read(5)
 			#print(header1)
 
 			if header1 != b'OggS\x00':
 				#no new song or error
-				print('Wrong header1')
-				print(header1)
+				print('Wrong header1' + str(header1))
 				self.time_loops = 0
 				self.event_next.clear()
 				continue
 
-			header += 1
+			self.header += 1
 			header2 = stream.read(1)
 			if header2 == b'\x00':
 				#print('Next page')
@@ -122,15 +124,14 @@ class ChrisPlayer(threading.Thread):
 				self.time_loops = 0
 				stream.read(20)#skip crc etc
 
-			elif stream.read(1) == b'\x04':
+			elif header2 == b'\x04':
 				#end song
 				print('Song end')
 				stream.read(20) #skip crc etc
 				self.event_next.clear()
 
 			else:
-				print('Wrong header2: ')
-				print(header2)
+				print('Wrong header2: ' + str(header2))
 				self.event_next.clear()
 				continue
 
@@ -154,7 +155,7 @@ class ChrisPlayer(threading.Thread):
 						self.voice.play_audio(packet, encode=False)
 
 					else:
-						print(header)
+						print('Header ' + str(self.header))
 
 					packet_size = 0
 					time_next = self.time_start + self.time_delay * self.time_loops
