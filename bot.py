@@ -54,44 +54,14 @@ class ChrisPlayer(threading.Thread):
 					print('Next Song')
 					self.event_next.set()
 
-				song_link = self.list_song.pop()
-				print(song_link)
+				song_file = self.list_song.pop()
+				print(song_fil)
 
 				song_requester = self.list_requester.pop()
 				print(song_requester)
 
-				if len(song_link) > 20:
-					print('Too big')
-					return
-
-				file_youtube = song_link + '.webm'
-				print('Checking ' + file_youtube)
-				path_youtube = Path(file_youtube)
-
-				if not path_youtube.is_file():
-					ydl_opts = {'format': '251/250/249', 'output': file_youtube}
-
-					with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-						song_info = ydl.extract_info(song_link, download=False)
-						song_url = song_info.get('url', None)
-						song_title = song_info.get('title', None)
-						song_id = song_info.get('id', None)
-						song_duration = song_info.get('duration', None)
-
-					if song_duration < 600:
-						urllib.request.urlretrieve(song_url, file_youtube)
-
-					else:
-						return
-
-				file_opus = file_youtube + '.opus'
-				print('Checking ' + file_opus)
-				path_opus = Path(file_opus)
-
-				if not path_opus.is_file():
-					command = ['mkvextract', 'tracks', file_youtube, '0:' + file_opus]
-					succes = subprocess.run(command)
-					print(succes)
+				print('Checking ' + song_file)
+				path_opus = Path(song_file)
 
 				f = open(file_opus, 'rb')
 				stream = io.BytesIO(f.read())
@@ -202,10 +172,42 @@ class ChrisPlayer(threading.Thread):
 		return str(skipper_amount) + ' skippers out of ' + str(skipper_needed)
 
 	def add(self, song, requester):
-		self.list_song.append(song)
+		if len(song) > 20:
+			return('Wrong song link')
+
+		file_youtube = song + '.webm'
+		print('Checking ' + file_youtube)
+		path_youtube = Path(file_youtube)
+
+		if not path_youtube.is_file():
+			ydl_opts = {'format': '251/250/249', 'output': file_youtube}
+
+		with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+			song_info = ydl.extract_info(song_link, download=False)
+			song_url = song_info.get('url', None)
+			song_title = song_info.get('title', None)
+			song_id = song_info.get('id', None)
+			song_duration = song_info.get('duration', None)
+
+		if song_duration < 600:
+			urllib.request.urlretrieve(song_url, file_youtube)
+		else:
+			return('Song {}, by: {} is too long'.format(song_title, requester))
+
+		file_opus = file_youtube + '.opus'
+		print('Checking ' + file_opus)
+		path_opus = Path(file_opus)
+
+		if not path_opus.is_file():
+			command = ['mkvextract', 'tracks', file_youtube, '0:' + file_opus]
+			succes = subprocess.run(command)
+			print(succes)
+
+		self.list_song.append(path_opus)
 		self.list_requester.append(requester)
 		self.event_next.set()
-		print('Added song: {} \nBy: {}'.format(song, requester))
+
+		return('Added song {}, by: {}'.format(song_title, requester))
 
 class ChrisReddit:
 	def __init__(self, subredit):
@@ -289,12 +291,13 @@ class ChrisCommands:
 	async def add(self, ctx, song : str):
 		"""Plays youtube song, give youtube id only."""
 		if self.player is None:
-			success = await ctx.invoke(self.summon)
-			if not success:
-				return
+			await ctx.invoke(self.summon)
+			#success =
+			#if not success:
+				#return
 
-		self.player.add(song,ctx.message.author)
-		await self.bot.say('Song added')
+		succes = self.player.add(song,ctx.message.author)
+		await self.bot.say(succes)
 
 	@commands.command(pass_context=True)
 	async def stop(self, ctx):
