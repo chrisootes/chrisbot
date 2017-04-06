@@ -60,13 +60,10 @@ class ChrisPlayer(threading.Thread):
 				song_requester = self.list_requester.pop()
 				print(song_requester)
 
-				print('Checking ' + song_file)
-				path_opus = Path(song_file)
-
 				f = open(file_opus, 'rb')
 				stream = io.BytesIO(f.read())
 				f.close
-				print('Playing ' + str(song_link))
+				print('Playing ' + str(song_file) + song_requester)
 
 				self.time_start = time.time()
 				self.time_loops = 0
