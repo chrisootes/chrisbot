@@ -55,7 +55,7 @@ class ChrisPlayer(threading.Thread):
 					self.event_next.set()
 
 				song_file = self.list_song.pop()
-				print(song_fil)
+				print(song_file)
 
 				song_requester = self.list_requester.pop()
 				print(song_requester)
@@ -278,7 +278,7 @@ class ChrisCommands:
 			except Exception as e:
 				print(e)
 				return('Youtube part fucked up mate')
-				
+
 			song_url = song_info.get('url', None)
 			song_title = song_info.get('title', None)
 			song_id = song_info.get('id', None)
