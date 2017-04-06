@@ -272,6 +272,7 @@ class ChrisCommands:
 
 			try:
 				song_info = youtube_dl.YoutubeDL(ydl_opts).extract_info(song_link, download=False)
+				
 			except Exception as e:
 				print(e)
 				return('Youtube part fucked up mate')
@@ -284,11 +285,16 @@ class ChrisCommands:
 			if song_duration < 600:
 				try:
 					urllib.request.urlretrieve(song_url, file_youtube)
+
 				except Exception as e:
 					print(e)
 					return('Youtube part fucked up mate')
+
 			else:
 				return('Song {}, by: {} is too long'.format(song_title, requester))
+
+		else:
+			song_title = 'Dunno'
 
 		file_opus = file_youtube + '.opus'
 		print('Checking ' + file_opus)
