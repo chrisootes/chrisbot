@@ -261,7 +261,8 @@ class ChrisCommands:
 				#return
 
 		if len(song) > 20:
-			return('Wrong song link')
+			await self.bot.say('Wrong song link')
+			return
 
 		file_youtube = song + '.webm'
 		print('Checking ' + file_youtube)
@@ -271,11 +272,12 @@ class ChrisCommands:
 			ydl_opts = {'format': '251/250/249', 'output': file_youtube}
 
 			try:
-				song_info = youtube_dl.YoutubeDL(ydl_opts).extract_info(song_link, download=False)
-				
+				song_info = youtube_dl.YoutubeDL(ydl_opts).extract_info(song, download=False)
+
 			except Exception as e:
 				print(e)
-				return('Youtube part fucked up mate')
+				await self.bot.say('Youtube part fucked up mate')
+				return
 
 			song_url = song_info.get('url', None)
 			song_title = song_info.get('title', None)
@@ -288,10 +290,12 @@ class ChrisCommands:
 
 				except Exception as e:
 					print(e)
-					return('Youtube part fucked up mate')
+					await self.bot.say('Youtube part fucked up mate')
+					return
 
 			else:
-				return('Song {}, by: {} is too long'.format(song_title, requester))
+				await self.bot.say('Song {}, by: {} is too long'.format(song_title, requester))
+				return
 
 		else:
 			song_title = 'Dunno'
