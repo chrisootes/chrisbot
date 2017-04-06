@@ -177,13 +177,16 @@ class ChrisPlayer(threading.Thread):
 
 		skipper_channel = self.voice.channel
 		print(skipper_channel)
+
 		skipper_members = self.voice.server.members
 		skipper_max = 0
+
 		for member in skipper_members:
 			skipper_legit = member.voice.voice_channel
 			#print(skipper_legit)
 			if skipper_legit == skipper_channel:
-				skipper_max =+ 1
+				skipper_max += 1
+
 		print('People in voice ' + str(skipper_max))
 
 		skipper_needed = math.floor(0.50*skipper_max)
