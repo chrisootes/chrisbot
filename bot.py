@@ -291,7 +291,7 @@ class ChrisCommands:
 
 				except Exception as e:
 					print(e)
-					await self.bot.say('Youtube part fucked up mate')
+					await self.bot.say('Download failed')
 					return
 
 			else:
@@ -306,10 +306,17 @@ class ChrisCommands:
 		path_opus = Path(file_opus)
 
 		if not path_opus.is_file():
-			command = ['mkvextract', 'tracks', file_youtube, '0:' + file_opus]
+			try:
+				command = ['mkvextract', 'tracks', file_youtube, '0:' + file_opus]
+				
+			except Exception as e:
+					print(e)
+					await self.bot.say('File conversion failed')
+					return
+					
 			succes = subprocess.run(command)
 			print(succes)
-
+			
 		self.player.add(path_opus, ctx.message.author)
 
 		await self.bot.say('Added song {}, by: {}'.format(song_title, str(ctx.message.author)))
