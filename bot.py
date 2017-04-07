@@ -306,15 +306,16 @@ class ChrisCommands:
 		path_opus = Path(file_opus)
 
 		if not path_opus.is_file():
+			command = ['mkvextract', 'tracks', file_youtube, '0:' + file_opus]
+			
 			try:
-				command = ['mkvextract', 'tracks', file_youtube, '0:' + file_opus]
+			succes = subprocess.run(command)
 				
 			except Exception as e:
-					print(e)
-					await self.bot.say('File conversion failed')
-					return
+				print(e)
+				await self.bot.say('File conversion failed')
+				return
 					
-			succes = subprocess.run(command)
 			print(succes)
 			
 		self.player.add(path_opus, ctx.message.author)
