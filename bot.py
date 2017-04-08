@@ -118,9 +118,10 @@ class ChrisPlayer(threading.Thread):
 					self.time_loops += 1
 					packet_size += lacing
 					packet = stream.read(packet_size)
+					
 					if self.header > 2:
 						self.voice.play_audio(packet, encode=False)
-
+						
 					else:
 						print('Header ' + str(self.header))
 
@@ -133,6 +134,7 @@ class ChrisPlayer(threading.Thread):
 		self.voice.disconnect()
 
 	def stop(self):
+		print('Stopping')
 		self.event_end.set()
 		self.event_next.clear()
 
@@ -165,6 +167,7 @@ class ChrisPlayer(threading.Thread):
 
 		if skipper_amount >= skipper_needed:
 			self.event_next.clear()
+			self.list_skippers = []
 			return 'Skipped'
 
 		return str(skipper_amount) + ' skippers out of ' + str(skipper_needed)
@@ -218,6 +221,7 @@ class ChrisCommands:
 	@commands.command(pass_context=True)
 	async def reet(self, ctx, reeten : int):
 		"""Rates with buts."""
+		await self.bot.delete_message(ctx.message)
 		await self.bot.say(str('<:reet:240860984086888449> ') * reeten)
 
 	@commands.command(pass_context=True)
@@ -343,4 +347,7 @@ bot.add_cog(ChrisCommands(bot))
 async def on_ready():
 	print('Logged in as: {0} \nUser ID: {0.id}'.format(bot.user))
 
-bot.run('MTkxMzMxODY1MjUxMTUxODcy.Cv5KNw.FF8ar2Ik21ou_GFyeyTXO7OeBx4')
+tokenfile = open(token.txt, 'rt')
+token = tokenfile.read()
+tokenfile.close
+bot.run(token)
