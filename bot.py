@@ -310,9 +310,9 @@ class ChrisCommands:
 			succes = subprocess.run(command)
 			print(succes.returncode)
 		
-		if succes.returncode != 0:
-			await self.bot.say('Youtube mkv container extraction failed')
-			return
+			if succes.returncode != 0:
+				await self.bot.say('Youtube mkv container extraction failed')
+				return
 			
 		self.player.add(path_opus, ctx.message.author)
 
