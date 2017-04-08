@@ -307,16 +307,12 @@ class ChrisCommands:
 
 		if not path_opus.is_file():
 			command = ['mkvextract', 'tracks', file_youtube, '0:' + file_opus]
-			
-			try:
-				succes = subprocess.run(command)
-				
-			except Exception as e:
-				print(e)
-				await self.bot.say('File conversion failed')
-				return
-					
-			print(succes)
+			succes = subprocess.run(command)
+			print(succes.returncode)
+		
+		if succes.returncode != 0:
+			await self.bot.say('Youtube mkv container extraction failed')
+			return
 			
 		self.player.add(path_opus, ctx.message.author)
 
