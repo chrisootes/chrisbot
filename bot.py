@@ -223,11 +223,16 @@ class ChrisCommands:
 
 	async def background_song(self):
 		await self.bot.wait_until_ready()
+		song_old = self.player.current()
 		while not self.bot.is_closed:
-			song_game = discord.Game(name=self.player.current())
-			#song_status = random.choice((discord.Status.online(), discord.Status.idle(), discord.Status.dnd()))
-			await self.bot.change_presence(game=song_game)
-			await asyncio.sleep(10) # task runs every 10 seconds
+			song_new = self.player.current()
+			if song_old != song_new:
+				song_old = song_new
+				song_game = discord.Game(name=)
+				song_status = random.choice((discord.Status.online, discord.Status.idle, discord.Status.dnd))
+				await self.bot.change_presence(game=song_game, status=song_status)
+
+			await asyncio.sleep(1) # task runs every 1 seconds
 
 	@commands.command(pass_context=True)
 	async def echo(self, ctx, msg : str):
@@ -278,7 +283,6 @@ class ChrisCommands:
 
 		print('Creating background task')
 		self.bot.loop.create_task(ChrisCommands.background_song(self))
-
 		return True
 
 	@commands.command(pass_context=True)
@@ -292,10 +296,8 @@ class ChrisCommands:
 				return
 
 		ydl_opts = {'format': '251/250/249'}
-
 		try:
 			song_info = youtube_dl.YoutubeDL(ydl_opts).extract_info(song, download=False)
-
 		except Exception as e:
 			print(e)
 			await self.bot.say('Youtube failed')
@@ -305,21 +307,17 @@ class ChrisCommands:
 		song_title = song_info.get('title', None)
 		song_id = song_info.get('id', None)
 		song_duration = song_info.get('duration', None)
-
 		file_youtube = song_id + '.webm'
 		print('Checking ' + file_youtube)
 		path_youtube = Path(file_youtube)
-
 		if not path_youtube.is_file():
 			if song_duration < 600:
 				try:
 					urllib.request.urlretrieve(song_url, file_youtube)
-
 				except Exception as e:
 					print(e)
 					await self.bot.say('Download failed')
 					return
-
 			else:
 				await self.bot.say('Song ' + str(song_title) + ' by ' + str(ctx.message.author) + ' is too long')
 				return
@@ -327,18 +325,15 @@ class ChrisCommands:
 		file_opus = file_youtube + '.opus'
 		print('Checking ' + file_opus)
 		path_opus = Path(file_opus)
-
 		if not path_opus.is_file():
 			command = ['mkvextract', 'tracks', file_youtube, '0:' + file_opus]
 			succes = subprocess.run(command)
 			print(succes.returncode)
-
 			if succes.returncode != 0:
 				await self.bot.say('Youtube mkv container extraction failed')
 				return
 
 		self.player.add(path_opus, song_title)
-
 		await self.bot.say('Added song: ' + str(song_title) + ' by ' + str(ctx.message.author))
 
 	@commands.command(pass_context=True)
@@ -355,7 +350,6 @@ class ChrisCommands:
 			print('Joined')
 		else:
 			await self.bot.say('Mute and/or vote to skip')
-
 		await self.bot.say('Stopped')
 
 	@commands.command(pass_context=True)
