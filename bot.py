@@ -351,5 +351,5 @@ async def on_ready():
 tokenfile = open('token.txt', 'rt')
 token = tokenfile.readline().splitlines()
 tokenfile.close
-print('Token: ' + token)
-bot.run(token)
+print('Token: ' + token[0])
+bot.run(token[0])
