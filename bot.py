@@ -226,7 +226,7 @@ class ChrisCommands:
 		while not self.bot.is_closed:
 			song_game = discord.Game(name=self.player.current)
 			song_status = random.choice((discord.Status.online, discord.Status.idle, discord.Status.dnd))
-			await self.bot.change_presence(game=echogame, status=song_status)
+			await self.bot.change_presence(game=song_game, status=song_status)
 			await asyncio.sleep(10) # task runs every 10 seconds
 
 	@commands.command(pass_context=True)
