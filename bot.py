@@ -217,7 +217,9 @@ class ChrisCommands:
 	@commands.command(pass_context=True)
 	async def echo(self, ctx, msg : str):
 		"""Repeats message."""
-		await self.bot.say(msg)
+		await self.bot.delete_message(ctx.message)
+		echogame = discord.Game(name=msg)
+		await self.bot.change_status(game=echogame, idle=False)
 
 	@commands.command(pass_context=True)
 	async def reet(self, ctx, reeten : int):
