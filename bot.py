@@ -8,6 +8,7 @@ import subprocess
 import random
 import re
 import math
+import json
 
 import urllib.request
 
@@ -319,7 +320,9 @@ class ChrisCommands:
 			await self.bot.say('Youtube failed')
 			return
 
-		print(song_info)
+		with open('debug.txt', 'w') as outfile:
+		    json.dump(song_info, outfile)
+
 		song_url = song_info.get('url', None)
 		song_title = song_info.get('title', None)
 		song_id = song_info.get('id', None)
