@@ -300,6 +300,7 @@ class ChrisCommands:
 				return
 
 		ydl_opts = {
+		'playlistend': 1,
 		'noplaylist': True,
 		'format': '251/250/249'
 		}
