@@ -347,7 +347,7 @@ bot.add_cog(ChrisCommands(bot))
 async def on_ready():
 	print('Logged in as: {0} \nUser ID: {0.id}'.format(bot.user))
 
-tokenfile = open(token.txt, 'rt')
+tokenfile = open('token.txt', 'rt')
 token = tokenfile.read()
 tokenfile.close
 bot.run(token)
