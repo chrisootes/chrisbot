@@ -360,7 +360,7 @@ bot.add_cog(ChrisCommands(bot))
 
 async def background_song():
 	#await bot.wait_until_ready()
-	while not client.is_closed:
+	while not bot.is_closed:
 		if not self.player == None:
 			song_game = discord.Game(name=self.player.current)
 		else:
