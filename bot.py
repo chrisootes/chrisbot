@@ -221,19 +221,6 @@ class ChrisCommands:
 		self.player = None
 		self.reddit_object = {}
 
-	async def background_song():
-		#await bot.wait_until_ready()
-		while not client.is_closed:
-			if not self.player == None:
-				song_game = discord.Game(name=self.player.current)
-			else:
-				song_game = discord.Game(name='Nothing')
-
-			song_status = random.choice((discord.Status.online, discord.Status.idle, discord.Status.dnd))
-
-			await self.bot.change_presence(game=echogame, status=song_status)
-			await asyncio.sleep(10) # task runs every 10 seconds
-
 	@commands.command(pass_context=True)
 	async def echo(self, ctx, msg : str):
 		"""Repeats message."""
@@ -370,6 +357,19 @@ class ChrisCommands:
 
 bot = commands.Bot(command_prefix='$', description='Kinky bot')
 bot.add_cog(ChrisCommands(bot))
+
+async def background_song():
+	#await bot.wait_until_ready()
+	while not client.is_closed:
+		if not self.player == None:
+			song_game = discord.Game(name=self.player.current)
+		else:
+			song_game = discord.Game(name='Nothing')
+
+		song_status = random.choice((discord.Status.online, discord.Status.idle, discord.Status.dnd))
+
+		await self.bot.change_presence(game=echogame, status=song_status)
+		await asyncio.sleep(10) # task runs every 10 seconds
 
 @bot.event
 async def on_ready():
