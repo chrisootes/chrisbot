@@ -300,6 +300,7 @@ class ChrisCommands:
 				return
 
 		ydl_opts = {
+		'max-downloads' ; 1,
 		'no-playlist': True,
 		'format': '251/250/249'
 		}
