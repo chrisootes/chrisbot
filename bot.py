@@ -237,7 +237,7 @@ class ChrisCommands:
 
 				await self.bot.change_presence(game=song_game, status=song_status)
 
-			await asyncio.sleep(5) # task runs every 2 seconds
+			await asyncio.sleep(5) # task runs every 5 seconds
 
 	@commands.command(pass_context=True)
 	async def echo(self, ctx, msg : str):
@@ -274,6 +274,7 @@ class ChrisCommands:
 	@commands.command(pass_context=True, no_pm=True)
 	async def summon(self, ctx):
 		"""Summons youtube player."""
+		print(ctx.message)
 		#await self.bot.delete_message(ctx.message)
 		summoned_channel = ctx.message.author.voice_channel
 		if summoned_channel is None:
@@ -284,9 +285,12 @@ class ChrisCommands:
 			self.player = ChrisPlayer(await self.bot.join_voice_channel(summoned_channel))
 			self.player.setName('MusicPlayer 1')
 			self.player.start()
+			print('Creating background task')
+			self.bot.loop.create_task(ChrisCommands.background_song(self))
 
-		print('Creating background task')
-		self.bot.loop.create_task(ChrisCommands.background_song(self))
+		else:
+			await self.bot.join_voice_channel(summoned_channel)
+
 		return True
 
 	@commands.command(pass_context=True)
@@ -338,7 +342,7 @@ class ChrisCommands:
 		if not path_opus.is_file():
 			command = ['mkvextract', 'tracks', file_youtube, '0:' + file_opus]
 			succes = subprocess.run(command)
-			print(succes.returncode)
+			print('Returncode: ' + str(succes.returncode))
 			if succes.returncode != 0:
 				await self.bot.say('Youtube mkv container extraction failed')
 				return
