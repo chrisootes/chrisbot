@@ -228,11 +228,11 @@ class ChrisCommands:
 			song_new = self.player.current()
 			if song_old != song_new:
 				song_old = song_new
-				song_game = discord.Game(name=)
+				song_game = discord.Game(name=song_old)
 				song_status = random.choice((discord.Status.online, discord.Status.idle, discord.Status.dnd))
 				await self.bot.change_presence(game=song_game, status=song_status)
 
-			await asyncio.sleep(1) # task runs every 1 seconds
+			await asyncio.sleep(2) # task runs every 2 seconds
 
 	@commands.command(pass_context=True)
 	async def echo(self, ctx, msg : str):
