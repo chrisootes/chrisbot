@@ -23,6 +23,7 @@ import youtube_dl
 import discord
 from discord.ext import commands
 
+#music player class tread
 class ChrisPlayer(threading.Thread):
 	def __init__(self, voice):
 		threading.Thread.__init__(self)
@@ -73,6 +74,7 @@ class ChrisPlayer(threading.Thread):
 				self.time_loops = 0
 				self.header = 0
 
+			#read ogg container
 			header1 = stream.read(5)
 			#print(header1)
 
@@ -197,7 +199,7 @@ class ChrisReddit:
 
 	def reddit(self):
 		reddit_current = time.time()
-		reddit_old = self.reddit_time+36000
+		reddit_old = self.reddit_time + 36000
 
 		if reddit_old < reddit_current:
 			self.reddit_feed = feedparser.parse('https://www.reddit.com/r/{}/top/.rss?sort=top&t=week'.format(self.reddit_sub))
@@ -237,7 +239,7 @@ class ChrisCommands:
 
 				await self.bot.change_presence(game=song_game, status=song_status)
 
-			await asyncio.sleep(5) # task runs every 5 seconds
+			await asyncio.sleep(1) # task runs every 5 seconds
 
 	@commands.command(pass_context=True)
 	async def echo(self, ctx, msg : str):
@@ -275,7 +277,7 @@ class ChrisCommands:
 	async def summon(self, ctx):
 		"""Summons youtube player."""
 		print(ctx.message)
-		#await self.bot.delete_message(ctx.message)
+		#await self.bot.delete_message(ctx.message) #cant delete twice after invoke
 		summoned_channel = ctx.message.author.voice_channel
 		if summoned_channel is None:
 			await self.bot.say('You are not in a voice channel.')
@@ -286,10 +288,11 @@ class ChrisCommands:
 			self.player.setName('MusicPlayer 1')
 			self.player.start()
 			print('Creating background task')
-			self.bot.loop.create_task(ChrisCommands.background_song(self))
+			self.bot.loop.create_task(ChrisCommands.background_song(self)) #create task to check the current song and change status
 
 		else:
-			await self.bot.join_voice_channel(summoned_channel)
+			print('moving to: ' + str(summoned_channel))
+			await self.bot.move_to(summoned_channel)
 
 		return True
 
@@ -304,7 +307,7 @@ class ChrisCommands:
 				return
 
 		ydl_opts = {
-		'playlist_items': 1, #broke shit
+		'playlist_items': '1', #broke shit
 		#'noplaylist': True, #broke shit
 		'format': '251/250/249'
 		}
@@ -360,7 +363,7 @@ class ChrisCommands:
 			print('Beginning')
 			self.player.stop()
 			print('Joining')
-			self.player.join()
+			self.player.join() #bugged
 			print('Joined')
 		else:
 			await self.bot.say('Mute and/or vote to skip')
@@ -375,7 +378,7 @@ class ChrisCommands:
 			await self.bot.say(succes)
 
 bot = commands.Bot(command_prefix='$', description='Kinky bot')
-bot.add_cog(ChrisCommands(bot))
+bot.add_cog(ChrisCommands(bot)) #add all commands from this class
 
 @bot.event
 async def on_ready():
