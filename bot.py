@@ -349,7 +349,7 @@ async def on_ready():
 	print('User ID: ' + bot.user.id)
 
 tokenfile = open('token.txt', 'rt')
-token = tokenfile.read()
+token = tokenfile.readline()
 tokenfile.close
 print('Token: ' + token)
 bot.run(token)
