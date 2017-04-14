@@ -224,7 +224,7 @@ class ChrisCommands:
 	async def background_song(self):
 		await self.bot.wait_until_ready()
 		while not self.bot.is_closed:
-			song_game = discord.Game(name=self.player.current)
+			song_game = discord.Game(name=self.player.current())
 			#song_status = random.choice((discord.Status.online(), discord.Status.idle(), discord.Status.dnd()))
 			await self.bot.change_presence(game=song_game)
 			await asyncio.sleep(10) # task runs every 10 seconds
