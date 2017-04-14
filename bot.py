@@ -37,7 +37,7 @@ class ChrisPlayer(threading.Thread):
 		self.list_names = []
 		self.list_skippers = []
 
-		self.song_name
+		self.song_name =  'Nothing'
 
 		self.time_delay = 0.02
 		self.time_loops = 0
@@ -221,6 +221,14 @@ class ChrisCommands:
 		self.player = None
 		self.reddit_object = {}
 
+	async def background_song(self):
+		await self.bot.wait_until_ready()
+		while not self.bot.is_closed:
+			song_game = discord.Game(name=self.player.current)
+			song_status = random.choice((discord.Status.online, discord.Status.idle, discord.Status.dnd))
+			await self.bot.change_presence(game=echogame, status=song_status)
+			await asyncio.sleep(10) # task runs every 10 seconds
+
 	@commands.command(pass_context=True)
 	async def echo(self, ctx, msg : str):
 		"""Repeats message."""
@@ -267,6 +275,9 @@ class ChrisCommands:
 			self.player = ChrisPlayer(await self.bot.join_voice_channel(summoned_channel))
 			self.player.setName('MusicPlayer 1')
 			self.player.start()
+
+		print('Creating background task')
+		self.bot.loop.create_task(background_song())
 
 		return True
 
@@ -358,25 +369,10 @@ class ChrisCommands:
 bot = commands.Bot(command_prefix='$', description='Kinky bot')
 bot.add_cog(ChrisCommands(bot))
 
-async def background_song():
-	#await bot.wait_until_ready()
-	while not bot.is_closed:
-		if not self.player == None:
-			song_game = discord.Game(name=self.player.current)
-		else:
-			song_game = discord.Game(name='Nothing')
-
-		song_status = random.choice((discord.Status.online, discord.Status.idle, discord.Status.dnd))
-
-		await self.bot.change_presence(game=echogame, status=song_status)
-		await asyncio.sleep(10) # task runs every 10 seconds
-
 @bot.event
 async def on_ready():
 	print('Logged in as: ' + str(bot.user))
 	print('User ID: ' + str(bot.user.id))
-	print('Creating background task')
-	bot.loop.create_task(background_song())
 
 tokenfile = open('token.txt', 'rt')
 token = tokenfile.readline().splitlines()
