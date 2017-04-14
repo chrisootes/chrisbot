@@ -238,7 +238,7 @@ class ChrisCommands:
 				return
 			self.reddit[subreddit] = reddit_obj
 
-		print('Subredit: {}'.format(subreddit))
+		print('Subredit: ' + str(subreddit))
 		reddit_link = reddit_obj.reddit()
 		print(reddit_link)
 		await self.bot.say(reddit_link)
@@ -273,22 +273,23 @@ class ChrisCommands:
 		print('Checking ' + file_youtube)
 		path_youtube = Path(file_youtube)
 
+
+		ydl_opts = {'format': '251/250/249', 'output': file_youtube}
+
+		try:
+			song_info = youtube_dl.YoutubeDL(ydl_opts).extract_info(song, download=False)
+
+		except Exception as e:
+			print(e)
+			await self.bot.say('Youtube part fucked up mate')
+			return
+
+		song_url = song_info.get('url', None)
+		song_title = song_info.get('title', None)
+		song_id = song_info.get('id', None)
+		song_duration = song_info.get('duration', None)
+
 		if not path_youtube.is_file():
-			ydl_opts = {'format': '251/250/249', 'output': file_youtube}
-
-			try:
-				song_info = youtube_dl.YoutubeDL(ydl_opts).extract_info(song, download=False)
-
-			except Exception as e:
-				print(e)
-				await self.bot.say('Youtube part fucked up mate')
-				return
-
-			song_url = song_info.get('url', None)
-			song_title = song_info.get('title', None)
-			song_id = song_info.get('id', None)
-			song_duration = song_info.get('duration', None)
-
 			if song_duration < 600:
 				try:
 					urllib.request.urlretrieve(song_url, file_youtube)
@@ -299,11 +300,8 @@ class ChrisCommands:
 					return
 
 			else:
-				await self.bot.say('Song ' + song_title + ', by: ' + str(ctx.message.author) + ' is too long')
+				await self.bot.say('Song ' + str(song_title) + ', by: ' + str(ctx.message.author) + ' is too long')
 				return
-
-		else:
-			song_title = 'dunno'
 
 		file_opus = file_youtube + '.opus'
 		print('Checking ' + file_opus)
@@ -320,7 +318,7 @@ class ChrisCommands:
 
 		self.player.add(path_opus, ctx.message.author)
 
-		await self.bot.say('Added song ' + song_title + ', by: ' + str(ctx.message.author))
+		await self.bot.say('Added song ' + str(song_title) + ', by: ' + str(ctx.message.author))
 
 	@commands.command(pass_context=True)
 	async def stop(self, ctx):
@@ -345,8 +343,8 @@ bot.add_cog(ChrisCommands(bot))
 
 @bot.event
 async def on_ready():
-	print('Logged in as: ' + bot.user)
-	print('User ID: ' + bot.user.id)
+	print('Logged in as: ' + str(bot.user))
+	print('User ID: ' + str(bot.user.id))
 
 tokenfile = open('token.txt', 'rt')
 token = tokenfile.readline().splitlines()
