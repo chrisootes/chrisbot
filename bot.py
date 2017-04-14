@@ -132,7 +132,7 @@ class ChrisPlayer(threading.Thread):
 					time.sleep(delay)
 
 		print('Stopping')
-		self.voice.disconnect()
+		self.voice.disconnect() #no working
 
 	def stop(self):
 		print('Stopping')
@@ -271,29 +271,24 @@ class ChrisCommands:
 			if not success:
 				return
 
-		if len(song) > 20:
-			await self.bot.say('Wrong song link')
-			return
-
-		file_youtube = song + '.webm'
-		print('Checking ' + file_youtube)
-		path_youtube = Path(file_youtube)
-
-
-		ydl_opts = {'format': '251/250/249', 'output': file_youtube}
+		ydl_opts = {'format': '251/250/249'}
 
 		try:
 			song_info = youtube_dl.YoutubeDL(ydl_opts).extract_info(song, download=False)
 
 		except Exception as e:
 			print(e)
-			await self.bot.say('Youtube part fucked up mate')
+			await self.bot.say('Youtube failed')
 			return
 
 		song_url = song_info.get('url', None)
 		song_title = song_info.get('title', None)
 		song_id = song_info.get('id', None)
 		song_duration = song_info.get('duration', None)
+
+		file_youtube = song_id + '.webm'
+		print('Checking ' + file_youtube)
+		path_youtube = Path(file_youtube)
 
 		if not path_youtube.is_file():
 			if song_duration < 600:
@@ -306,7 +301,7 @@ class ChrisCommands:
 					return
 
 			else:
-				await self.bot.say('Song ' + str(song_title) + ' by: ' + str(ctx.message.author) + ' is too long')
+				await self.bot.say('Song ' + str(song_title) + ' by ' + str(ctx.message.author) + ' is too long')
 				return
 
 		file_opus = file_youtube + '.opus'
