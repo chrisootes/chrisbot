@@ -63,7 +63,7 @@ class ChrisPlayer(threading.Thread):
 				f = open(song_file, 'rb')
 				stream = io.BytesIO(f.read())
 				f.close
-				print('Playing ' + str(song_file) + str(song_requester))
+				print('Playing ' + str(song_file) + ' by ' + str(song_requester))
 
 				self.time_start = time.time()
 				self.time_loops = 0
@@ -212,7 +212,7 @@ class ChrisCommands:
 	def __init__(self, bot):
 		self.bot = bot
 		self.player = None
-		self.reddit = {}
+		self.reddit_object = {}
 
 	@commands.command(pass_context=True)
 	async def echo(self, ctx, msg : str):
@@ -226,22 +226,22 @@ class ChrisCommands:
 		await self.bot.say(str('<:reet:240860984086888449> ') * reeten + ' from ' + str(ctx.message.author))
 
 	@commands.command(pass_context=True)
-	async def meme(self, ctx, subreddit : str):
+	async def reddit(self, ctx, subreddit : str):
 		"""Reddit rss."""
 		await self.bot.delete_message(ctx.message)
 		#whitelist?
-		reddit_obj = self.reddit.get(subreddit, None)
+		subreddit_object = self.reddit_object.get(subreddit, None)
 
-		if reddit_obj is None:
+		if subreddit_object is None:
 			try:
-				reddit_obj = ChrisReddit(subreddit)
+				subreddit_object = ChrisReddit(subreddit)
 			except:
 				await self.bot.say('Invalid subreddit')
 				return
-			self.reddit[subreddit] = reddit_obj
+			self.reddit_object[subreddit] = subreddit_object
 
 		print('Subredit: ' + str(subreddit))
-		reddit_link = reddit_obj.reddit()
+		reddit_link = subreddit_object.reddit()
 		print(reddit_link)
 		await self.bot.say(reddit_link)
 
@@ -252,12 +252,14 @@ class ChrisCommands:
 		summoned_channel = ctx.message.author.voice_channel
 		if summoned_channel is None:
 			await self.bot.say('You are not in a voice channel.')
-			return
+			return False
 
 		if self.player is None:
 			self.player = ChrisPlayer(await self.bot.join_voice_channel(summoned_channel))
 			self.player.setName('MusicPlayer 1')
 			self.player.start()
+
+		return True
 
 	@commands.command(pass_context=True)
 	async def add(self, ctx, song : str):
@@ -304,7 +306,7 @@ class ChrisCommands:
 					return
 
 			else:
-				await self.bot.say('Song ' + str(song_title) + ', by: ' + str(ctx.message.author) + ' is too long')
+				await self.bot.say('Song ' + str(song_title) + ' by: ' + str(ctx.message.author) + ' is too long')
 				return
 
 		file_opus = file_youtube + '.opus'
@@ -322,7 +324,7 @@ class ChrisCommands:
 
 		self.player.add(path_opus, ctx.message.author)
 
-		await self.bot.say('Added song ' + str(song_title) + ', by: ' + str(ctx.message.author))
+		await self.bot.say('Added song: ' + str(song_title) + ' by ' + str(ctx.message.author))
 
 	@commands.command(pass_context=True)
 	async def stop(self, ctx):
@@ -331,10 +333,15 @@ class ChrisCommands:
 		if self.player is None:
 			print(ctx.message.author.id)
 		elif ctx.message.author.id == '100280813244936192':
+			print('Beginning')
 			self.player.stop()
+			print('Joining')
 			self.player.join()
+			print('Joined')
 		else:
 			await self.bot.say('Mute and/or vote to skip')
+
+		await self.bot.say('Stopped')
 
 	@commands.command(pass_context=True)
 	async def skip(self, ctx):
