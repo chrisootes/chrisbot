@@ -223,16 +223,21 @@ class ChrisCommands:
 
 	async def background_song(self):
 		await self.bot.wait_until_ready()
-		song_old = self.player.current()
+		song_old = ''
 		while not self.bot.is_closed:
 			song_new = self.player.current()
-			if song_old != song_new:
+			if song_new == 'Nothing':
+				song_status = discord.Status.dnd
+			else:
+				song_status = discord.Status.online
+
+			if song_new != song_old:
 				song_old = song_new
 				song_game = discord.Game(name=song_old)
-				song_status = random.choice((discord.Status.online, discord.Status.idle, discord.Status.dnd))
+
 				await self.bot.change_presence(game=song_game, status=song_status)
 
-			await asyncio.sleep(2) # task runs every 2 seconds
+			await asyncio.sleep(5) # task runs every 2 seconds
 
 	@commands.command(pass_context=True)
 	async def echo(self, ctx, msg : str):
@@ -253,7 +258,6 @@ class ChrisCommands:
 		await self.bot.delete_message(ctx.message)
 		#whitelist?
 		subreddit_object = self.reddit_object.get(subreddit, None)
-
 		if subreddit_object is None:
 			try:
 				subreddit_object = ChrisReddit(subreddit)
@@ -295,7 +299,10 @@ class ChrisCommands:
 			if not success:
 				return
 
-		ydl_opts = {'format': '251/250/249'}
+		ydl_opts = {
+		'format': '251/250/249'
+		'skip_download': True
+		}
 		try:
 			song_info = youtube_dl.YoutubeDL(ydl_opts).extract_info(song, download=False)
 		except Exception as e:
