@@ -300,8 +300,8 @@ class ChrisCommands:
 				return
 
 		ydl_opts = {
-		'playlist_items': 1,
-		#'noplaylist': True,
+		'playlist_items': 1, #broke shit
+		#'noplaylist': True, #broke shit
 		'format': '251/250/249'
 		}
 
