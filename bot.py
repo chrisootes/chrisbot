@@ -49,6 +49,8 @@ class ChrisPlayer(threading.Thread):
 		while not self.event_end.is_set():
 			#print(self.time_loops)
 			if not self.event_next.is_set():
+				self.song_name = 'Nothing'
+
 				if len(self.list_song) == 0:
 					print('Waiting')
 					self.event_next.wait()
@@ -227,7 +229,9 @@ class ChrisCommands:
 			else:
 				song_game = discord.Game(name='Nothing')
 
-			await self.bot.change_status(game=echogame)
+			song_status = random.choice((discord.Status.online, discord.Status.idle, discord.Status.dnd))
+
+			await self.bot.change_presence(game=echogame, status=song_status)
 			await asyncio.sleep(10) # task runs every 10 seconds
 
 	@commands.command(pass_context=True)
