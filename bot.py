@@ -33,9 +33,11 @@ class ChrisPlayer(threading.Thread):
 		self.event_end = threading.Event()
 		self.event_next = threading.Event()
 
-		self.list_song = []
-		self.list_requester = []
+		self.list_songs = []
+		self.list_names = []
 		self.list_skippers = []
+
+		self.song_name
 
 		self.time_delay = 0.02
 		self.time_loops = 0
@@ -54,16 +56,16 @@ class ChrisPlayer(threading.Thread):
 					print('Next Song')
 					self.event_next.set()
 
-				song_file = self.list_song.pop()
+				song_file = self.list_songs.pop()
 				print(song_file)
 
-				song_requester = self.list_requester.pop()
-				print(song_requester)
+				self.song_name = self.list_names.pop()
+				print(self.song_name)
 
 				f = open(song_file, 'rb')
 				stream = io.BytesIO(f.read())
 				f.close
-				print('Playing ' + str(song_file) + ' by ' + str(song_requester))
+				print('Playing ' + str(self.song_name) + ' with ' + str(song_file))
 
 				self.time_start = time.time()
 				self.time_loops = 0
@@ -178,6 +180,9 @@ class ChrisPlayer(threading.Thread):
 		self.list_requester.append(requester)
 		self.event_next.set()
 
+	def current(self):
+		return self.song_name
+
 class ChrisReddit:
 	def __init__(self, subredit):
 		self.reddit_sub = subredit
@@ -214,12 +219,23 @@ class ChrisCommands:
 		self.player = None
 		self.reddit_object = {}
 
+	async def background_song():
+		#await bot.wait_until_ready()
+		while not client.is_closed:
+			if not self.player == None:
+				song_game = discord.Game(name=self.player.current)
+			else:
+				song_game = discord.Game(name='Nothing')
+
+			await self.bot.change_status(game=echogame)
+			await asyncio.sleep(10) # task runs every 10 seconds
+
 	@commands.command(pass_context=True)
 	async def echo(self, ctx, msg : str):
 		"""Repeats message."""
 		await self.bot.delete_message(ctx.message)
 		echogame = discord.Game(name=msg)
-		await self.bot.change_status(game=echogame, idle=False)
+		await self.bot.change_status(game=echogame)
 
 	@commands.command(pass_context=True)
 	async def reet(self, ctx, reeten : int):
@@ -319,7 +335,7 @@ class ChrisCommands:
 				await self.bot.say('Youtube mkv container extraction failed')
 				return
 
-		self.player.add(path_opus, ctx.message.author)
+		self.player.add(path_opus, song_title)
 
 		await self.bot.say('Added song: ' + str(song_title) + ' by ' + str(ctx.message.author))
 
@@ -355,6 +371,8 @@ bot.add_cog(ChrisCommands(bot))
 async def on_ready():
 	print('Logged in as: ' + str(bot.user))
 	print('User ID: ' + str(bot.user.id))
+	print('Creating background task')
+	bot.loop.create_task(background_song())
 
 tokenfile = open('token.txt', 'rt')
 token = tokenfile.readline().splitlines()
