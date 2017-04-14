@@ -277,7 +277,7 @@ class ChrisCommands:
 			self.player.start()
 
 		print('Creating background task')
-		self.bot.loop.create_task(ChrisCommands.background_song())
+		self.bot.loop.create_task(ChrisCommands.background_song(self))
 
 		return True
 
