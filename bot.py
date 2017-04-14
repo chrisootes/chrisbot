@@ -131,6 +131,7 @@ class ChrisPlayer(threading.Thread):
 					#print(delay)
 					time.sleep(delay)
 
+		print('Stopping')
 		self.voice.disconnect()
 
 	def stop(self):
@@ -227,6 +228,7 @@ class ChrisCommands:
 	@commands.command(pass_context=True)
 	async def meme(self, ctx, subreddit : str):
 		"""Reddit rss."""
+		await self.bot.delete_message(ctx.message)
 		#whitelist?
 		reddit_obj = self.reddit.get(subreddit, None)
 
@@ -246,6 +248,7 @@ class ChrisCommands:
 	@commands.command(pass_context=True, no_pm=True)
 	async def summon(self, ctx):
 		"""Summons youtube player."""
+		await self.bot.delete_message(ctx.message)
 		summoned_channel = ctx.message.author.voice_channel
 		if summoned_channel is None:
 			await self.bot.say('You are not in a voice channel.')
@@ -259,11 +262,12 @@ class ChrisCommands:
 	@commands.command(pass_context=True)
 	async def add(self, ctx, song : str):
 		"""Plays youtube song, give youtube id only."""
+		await self.bot.delete_message(ctx.message)
 		if self.player is None:
-			await ctx.invoke(self.summon)
-			#success =
-			#if not success:
-				#return
+			success = await ctx.invoke(self.summon)
+			print(success)
+			if not success:
+				return
 
 		if len(song) > 20:
 			await self.bot.say('Wrong song link')
@@ -323,17 +327,19 @@ class ChrisCommands:
 	@commands.command(pass_context=True)
 	async def stop(self, ctx):
 		"""Stop youtbube player."""
+		await self.bot.delete_message(ctx.message)
 		if self.player is None:
 			print(ctx.message.author.id)
 		elif ctx.message.author.id == '100280813244936192':
 			self.player.stop()
-			#self.player.join()
+			self.player.join()
 		else:
 			await self.bot.say('Mute and/or vote to skip')
 
 	@commands.command(pass_context=True)
 	async def skip(self, ctx):
 		"""Vote to skip song."""
+		await self.bot.delete_message(ctx.message)
 		if self.player is not None:
 			succes = self.player.skip(ctx.message.author.id)
 			await self.bot.say(succes)
