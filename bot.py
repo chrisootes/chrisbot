@@ -248,7 +248,7 @@ class ChrisCommands:
 	@commands.command(pass_context=True, no_pm=True)
 	async def summon(self, ctx):
 		"""Summons youtube player."""
-		await self.bot.delete_message(ctx.message)
+		#await self.bot.delete_message(ctx.message)
 		summoned_channel = ctx.message.author.voice_channel
 		if summoned_channel is None:
 			await self.bot.say('You are not in a voice channel.')
