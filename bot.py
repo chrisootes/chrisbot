@@ -299,7 +299,7 @@ class ChrisCommands:
 					return
 
 			else:
-				await self.bot.say('Song {}, by: {} is too long'.format(song_title, str(ctx.message.author)))
+				await self.bot.say('Song ' + song_title + ', by: ' + str(ctx.message.author) + ' is too long')
 				return
 
 		else:
@@ -320,7 +320,7 @@ class ChrisCommands:
 
 		self.player.add(path_opus, ctx.message.author)
 
-		await self.bot.say('Added song {}, by: {}'.format(song_title, str(ctx.message.author)))
+		await self.bot.say('Added song ' + song_title + ', by: ' + str(ctx.message.author))
 
 	@commands.command(pass_context=True)
 	async def stop(self, ctx):
@@ -345,9 +345,11 @@ bot.add_cog(ChrisCommands(bot))
 
 @bot.event
 async def on_ready():
-	print('Logged in as: {0} \nUser ID: {0.id}'.format(bot.user))
+	print('Logged in as: ' + bot.user)
+	print('User ID: ' + bot.user.id)
 
 tokenfile = open('token.txt', 'rt')
 token = tokenfile.read()
 tokenfile.close
+print('Token: ' + token)
 bot.run(token)
