@@ -300,9 +300,10 @@ class ChrisCommands:
 				return
 
 		ydl_opts = {
+		'no-playlist',
 		'format': '251/250/249'
-		'skip_download': True
 		}
+
 		try:
 			song_info = youtube_dl.YoutubeDL(ydl_opts).extract_info(song, download=False)
 		except Exception as e:
@@ -314,6 +315,7 @@ class ChrisCommands:
 		song_title = song_info.get('title', None)
 		song_id = song_info.get('id', None)
 		song_duration = song_info.get('duration', None)
+
 		file_youtube = song_id + '.webm'
 		print('Checking ' + file_youtube)
 		path_youtube = Path(file_youtube)
