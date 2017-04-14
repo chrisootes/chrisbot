@@ -319,6 +319,7 @@ class ChrisCommands:
 			await self.bot.say('Youtube failed')
 			return
 
+		print(song_info)
 		song_url = song_info.get('url', None)
 		song_title = song_info.get('title', None)
 		song_id = song_info.get('id', None)
