@@ -51,7 +51,7 @@ class ChrisPlayer(threading.Thread):
 			if not self.event_next.is_set():
 				self.song_name = 'Nothing'
 
-				if len(self.list_song) == 0:
+				if len(self.list_songs) == 0:
 					print('Waiting')
 					self.event_next.wait()
 				else:
@@ -177,9 +177,9 @@ class ChrisPlayer(threading.Thread):
 
 		return str(skipper_amount) + ' skippers out of ' + str(skipper_needed)
 
-	def add(self, song, requester):
-		self.list_song.append(song)
-		self.list_requester.append(requester)
+	def add(self, song, name):
+		self.list_songs.append(song)
+		self.list_names.append(name)
 		self.event_next.set()
 
 	def current(self):
