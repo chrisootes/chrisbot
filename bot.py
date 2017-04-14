@@ -118,10 +118,10 @@ class ChrisPlayer(threading.Thread):
 					self.time_loops += 1
 					packet_size += lacing
 					packet = stream.read(packet_size)
-					
+
 					if self.header > 2:
 						self.voice.play_audio(packet, encode=False)
-						
+
 					else:
 						print('Header ' + str(self.header))
 
@@ -222,7 +222,7 @@ class ChrisCommands:
 	async def reet(self, ctx, reeten : int):
 		"""Rates with buts."""
 		await self.bot.delete_message(ctx.message)
-		await self.bot.say(str('<:reet:240860984086888449> ') * reeten)
+		await self.bot.say(str('<:reet:240860984086888449> ') * reeten + ' from ' + str(ctx.message.author))
 
 	@commands.command(pass_context=True)
 	async def meme(self, ctx, subreddit : str):
@@ -303,7 +303,7 @@ class ChrisCommands:
 				return
 
 		else:
-			song_title = 'Dunno'
+			song_title = 'dunno'
 
 		file_opus = file_youtube + '.opus'
 		print('Checking ' + file_opus)
@@ -313,11 +313,11 @@ class ChrisCommands:
 			command = ['mkvextract', 'tracks', file_youtube, '0:' + file_opus]
 			succes = subprocess.run(command)
 			print(succes.returncode)
-		
+
 			if succes.returncode != 0:
 				await self.bot.say('Youtube mkv container extraction failed')
 				return
-			
+
 		self.player.add(path_opus, ctx.message.author)
 
 		await self.bot.say('Added song {}, by: {}'.format(song_title, str(ctx.message.author)))
