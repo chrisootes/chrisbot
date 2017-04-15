@@ -37,7 +37,6 @@ class ChrisPlayer(threading.Thread):
 
 		self.list_songs = []
 		self.list_names = []
-		self.list_skippers = []
 
 		self.song_name =  'Nothing'
 
@@ -146,39 +145,8 @@ class ChrisPlayer(threading.Thread):
 		self.event_end.set()
 		self.event_next.clear()
 
-	def skip(self, skipper):
-		for already in self.list_skippers:
-			if already == skipper:
-				return 'Cant skip twice'
-
-		self.list_skippers.append(skipper)
-
-		skipper_channel = self.voice.channel
-		print(skipper_channel)
-
-		skipper_members = self.voice.server.members
-		skipper_max = 0
-
-		for member in skipper_members:
-			skipper_legit = member.voice.voice_channel
-			#print(skipper_legit)
-			if skipper_legit == skipper_channel:
-				skipper_max += 1
-
-		print('People in voice ' + str(skipper_max))
-
-		skipper_needed = math.floor(0.50*skipper_max)
-		print('People needed ' + str(skipper_needed))
-
-		skipper_amount = len(self.list_skippers)
-		print('People voted ' + str(skipper_amount))
-
-		if skipper_amount >= skipper_needed:
-			self.event_next.clear()
-			self.list_skippers = []
-			return 'Skipped'
-
-		return str(skipper_amount) + ' skippers out of ' + str(skipper_needed)
+	def skip(self):
+		self.event_next.clear()
 
 	def add(self, song, name):
 		self.list_songs.append(song)
@@ -223,6 +191,7 @@ class ChrisCommands:
 		self.bot = bot
 		self.player = None
 		self.reddit_object = {}
+		self.list_skippers = []
 
 	async def background_song(self):
 		await self.bot.wait_until_ready()
@@ -305,13 +274,12 @@ class ChrisCommands:
 			success = await ctx.invoke(self.summon)
 			print(success)
 			if not success:
+				await self.bot.say('Failed to summon bot.')
 				return
 
 		ydl_opts = {
-		'playlist_items': '1', #broke shit
-		#'noplaylist': True, #broke shit
-		'format': '251/250/249'
-		}
+		'playlist_items': '1',
+		'format': '251/250/249'}
 
 		try:
 			song_info = youtube_dl.YoutubeDL(ydl_opts).extract_info(song, download=False)
@@ -320,13 +288,17 @@ class ChrisCommands:
 			await self.bot.say('Youtube failed')
 			return
 
-		with open('debug.txt', 'w') as outfile:
-		    json.dump(song_info, outfile)
+		if song_info.get('_type', None) == 'playlist':
+			song_url = song_info.get('entries[0].url', None)
+			song_title = song_info.get('entries[0].title', None)
+			song_id = song_info.get('entries[0].id', None)
+			song_duration = song_info.get('entries[0].duration', None)
 
-		song_url = song_info.get('url', None)
-		song_title = song_info.get('title', None)
-		song_id = song_info.get('id', None)
-		song_duration = song_info.get('duration', None)
+		else:
+			song_url = song_info.get('url', None)
+			song_title = song_info.get('title', None)
+			song_id = song_info.get('id', None)
+			song_duration = song_info.get('duration', None)
 
 		file_youtube = song_id + '.webm'
 		print('Checking ' + file_youtube)
@@ -377,9 +349,37 @@ class ChrisCommands:
 	async def skip(self, ctx):
 		"""Vote to skip song."""
 		await self.bot.delete_message(ctx.message)
-		if self.player is not None:
-			succes = self.player.skip(ctx.message.author.id)
-			await self.bot.say(succes)
+		if self.player is None:
+			await self.bot.say('Player is offline')
+
+		else:
+			for already in self.list_skippers:
+				if already == skipper:
+					await self.bot.say('Cant skip twice')
+					return
+
+			self.list_skippers.append(skipper)
+			skipper_channel = self.voice.channel
+			print(skipper_channel)
+			skipper_members = self.voice.server.members
+			skipper_max = 0
+			for member in skipper_members:
+				skipper_legit = member.voice.voice_channel
+				#print(skipper_legit)
+				if skipper_legit == skipper_channel:
+					skipper_max += 1
+
+			print('People in voice ' + str(skipper_max))
+			skipper_needed = math.floor(0.5*skipper_max)
+			print('People needed ' + str(skipper_needed))
+			skipper_amount = len(self.list_skippers)
+			print('People voted ' + str(skipper_amount))
+			if skipper_amount >= skipper_needed:
+				self.list_skippers = []
+				self.player.skip()
+				await self.bot.say('Skipped')
+			else:
+				await self.bot.say(str(skipper_amount) + ' skippers out of ' + str(skipper_needed))
 
 bot = commands.Bot(command_prefix='$', description='Kinky bot')
 bot.add_cog(ChrisCommands(bot)) #add all commands from this class
