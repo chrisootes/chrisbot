@@ -155,7 +155,7 @@ class ChrisPlayer:
     async def add(self, ctx, song : str):
         """Plays youtube song."""
         await self.bot.delete_message(ctx.message)
-        if self.song_playing == False:
+        if self.voice == None:
             success = await ctx.invoke(self.summon)
             print(success)
             if not success:
