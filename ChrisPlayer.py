@@ -30,7 +30,7 @@ class ChrisPlayer:
 		self.list_names = []
 
         self.song_playing = False
-
+        
 	async def background_song(self):
 		song_old = False
 		time_delay = 0.02
