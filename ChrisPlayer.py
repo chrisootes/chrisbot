@@ -143,7 +143,7 @@ class ChrisPlayer:
             print('Joining voice channel')
             self.voice = await self.bot.join_voice_channel(summoned_channel)
             print('Creating background task')
-            self.bot.loop.create_task(ChrisCommands.background_song(self)) #create task to check the current song and change status
+            self.bot.loop.create_task(ChrisPlayer.background_song(self)) #create task to check the current song and change status
 
         else:
             print('moving to: ' + str(summoned_channel))
@@ -225,7 +225,7 @@ class ChrisPlayer:
 
         elif ctx.message.author.id == '100280813244936192':
             print('Stopping')
-            #stop self.bot.loop.create_task(ChrisCommands.background_song(self))
+            #stop self.bot.loop.create_task(ChrisPlayer.background_song(self))
             self.voice.disconnect()
 
         else:
