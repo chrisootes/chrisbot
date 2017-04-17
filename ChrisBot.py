@@ -11,8 +11,8 @@ bot.add_cog(ChrisPlayer.ChrisPlayer(bot)) #add all commands from this class
 
 @bot.event
 async def on_ready():
-	print('Logged in as: ' + str(bot.user))
-	print('User ID: ' + str(bot.user.id))
+    print('Logged in as: ' + str(bot.user))
+    print('User ID: ' + str(bot.user.id))
 
 tokenfile = open('token.txt', 'rt')
 token = tokenfile.readline().splitlines()
