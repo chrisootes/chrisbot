@@ -59,10 +59,10 @@ class ChrisPlayer(threading.Thread):
 					print('Next Song')
 					self.event_next.set()
 
-				song_file = self.list_songs.pop()
+				song_file = self.list_songs.pop(0)
 				print(song_file)
 
-				self.song_name = self.list_names.pop()
+				self.song_name = self.list_names.pop(0)
 				print(self.song_name)
 
 				f = open(song_file, 'rb')
@@ -156,6 +156,7 @@ class ChrisPlayer(threading.Thread):
 	def current(self):
 		return self.song_name
 
+#reddit rss class
 class ChrisReddit:
 	def __init__(self, subredit):
 		self.reddit_sub = subredit
@@ -198,25 +199,24 @@ class ChrisCommands:
 		song_old = ''
 		while not self.bot.is_closed:
 			song_new = self.player.current()
-			if song_new == 'Nothing':
-				song_status = discord.Status.dnd
-			else:
-				song_status = discord.Status.online
-
 			if song_new != song_old:
 				song_old = song_new
 				song_game = discord.Game(name=song_old)
+				if song_new == 'Nothing':
+					song_status = discord.Status.dnd
+				else:
+					song_status = discord.Status.online
 
 				await self.bot.change_presence(game=song_game, status=song_status)
 
-			await asyncio.sleep(1) # task runs every 5 seconds
+			await asyncio.sleep(1) # task runs every 1 seconds
 
 	@commands.command(pass_context=True)
 	async def echo(self, ctx, msg : str):
 		"""Repeats message."""
 		await self.bot.delete_message(ctx.message)
-		echogame = discord.Game(name=msg)
-		await self.bot.change_presence(game=echogame)
+		await asyncio.sleep(10)
+		await self.bot.say('Reply: ' + msg)
 
 	@commands.command(pass_context=True)
 	async def reet(self, ctx, reeten : int):
@@ -268,7 +268,7 @@ class ChrisCommands:
 
 	@commands.command(pass_context=True)
 	async def add(self, ctx, song : str):
-		"""Plays youtube song, give youtube id only."""
+		"""Plays youtube song."""
 		await self.bot.delete_message(ctx.message)
 		if self.player is None:
 			success = await ctx.invoke(self.summon)
@@ -282,7 +282,7 @@ class ChrisCommands:
 		'format': '251/250/249'}
 
 		try:
-			song_info = youtube_dl.YoutubeDL(ydl_opts).extract_info(song, download=False)
+			song_info = youtube_dl.YoutubeDL(ydl_opts).extract_info(song, download=False) #create async threads to paralise
 		except Exception as e:
 			print(e)
 			await self.bot.say('Youtube failed')
@@ -306,7 +306,7 @@ class ChrisCommands:
 		if not path_youtube.is_file():
 			if song_duration < 600:
 				try:
-					urllib.request.urlretrieve(song_url, file_youtube)
+					urllib.request.urlretrieve(song_url, file_youtube) #create async threads to paralise
 				except Exception as e:
 					print(e)
 					await self.bot.say('Download failed')
@@ -335,6 +335,7 @@ class ChrisCommands:
 		await self.bot.delete_message(ctx.message)
 		if self.player is None:
 			print(ctx.message.author.id)
+			await self.bot.say('Nothin to stop')
 		elif ctx.message.author.id == '100280813244936192':
 			print('Beginning')
 			self.player.stop()
@@ -343,7 +344,6 @@ class ChrisCommands:
 			print('Joined')
 		else:
 			await self.bot.say('Mute and/or vote to skip')
-		await self.bot.say('Stopped')
 
 	@commands.command(pass_context=True)
 	async def skip(self, ctx):
