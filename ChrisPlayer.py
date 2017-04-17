@@ -23,7 +23,7 @@ class ChrisPlayer:
     """
     def __init__(self, bot):
         self.bot = bot
-        self.voice = voice
+        self.voice = None
         self.song_playing = False
         self.list_skippers = []
         self.list_songs = []
@@ -140,6 +140,7 @@ class ChrisPlayer:
             return False
 
         if self.song_playing == False:
+            print('Joining voice channel')
             self.voice = await self.bot.join_voice_channel(summoned_channel)
             print('Creating background task')
             self.bot.loop.create_task(ChrisCommands.background_song(self)) #create task to check the current song and change status
