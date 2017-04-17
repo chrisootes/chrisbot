@@ -3,11 +3,11 @@ import discord
 from discord.ext import commands
 
 import ChrisCommands
-#import ChrisPlayer
+import ChrisPlayer
 
 bot = commands.Bot(command_prefix='$', description='Kinky bot')
 bot.add_cog(ChrisCommands.ChrisCommands(bot)) #add all commands from this class
-#bot.add_cog(ChrisPlayer(bot)) #add all commands from this class
+bot.add_cog(ChrisPlayer.ChrisPlayer(bot)) #add all commands from this class
 
 @bot.event
 async def on_ready():

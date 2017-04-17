@@ -72,6 +72,7 @@ class ChrisCommands:
 			except:
 				await self.bot.say('Invalid subreddit')
 				return
+
 			self.reddit_object[subreddit] = subreddit_object
 
 		print('Subredit: ' + str(subreddit))

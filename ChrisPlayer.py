@@ -11,11 +11,9 @@ import urllib.request
 
 from pathlib import Path
 
-#youtube api
-import youtube_dl
+import youtube_dl #youtube api
 
-#discord api
-import discord
+import discord #discord api
 from discord.ext import commands
 
 class ChrisPlayer:
@@ -31,8 +29,9 @@ class ChrisPlayer:
 		self.list_songs = []
 		self.list_names = []
 
+        self.song_playing = False
+
 	async def background_song(self):
-		song_playing = False
 		song_old = False
 		time_delay = 0.02
 		time_loops = 0
@@ -41,7 +40,7 @@ class ChrisPlayer:
 
 		while not self.bot.is_closed:
 			#print(self.time_loops)
-			if song_playing == False:
+			if self.song_playing == False:
 				if len(self.list_songs) == 0:
 					if song_old == False:
 						song_old = True
@@ -51,7 +50,7 @@ class ChrisPlayer:
 					await asyncio.sleep(1)
 				else:
 					print('Next Song')
-					song_playing = True
+					self.song_playing = True
 					song_old = True
 
 					song_file = self.list_songs.pop(0)
@@ -74,12 +73,10 @@ class ChrisPlayer:
 					header = 0
 
 			else:
-				#read ogg header
 				header1 = stream.read(5)
 				#print(header1)
 
 				if header1 != b'OggS\x00':
-					#no new song or error
 					print('Wrong header1' + str(header1))
 					time_loops = 0
 					song_playing = False
@@ -92,12 +89,10 @@ class ChrisPlayer:
 					stream.read(20) #skip crc etc
 
 				elif header2 == b'\x02':
-					#new song
 					print('Song tag')
 					stream.read(20)#skip crc etc
 
 				elif header2 == b'\x04':
-					#end song
 					print('Song end')
 					stream.read(20) #skip crc etc
 					song_playing = False
@@ -146,16 +141,14 @@ class ChrisPlayer:
 			await self.bot.say('You are not in a voice channel.')
 			return False
 
-		if self.player is None:
-			self.player = ChrisPlayer(await self.bot.join_voice_channel(summoned_channel))
-			self.player.setName('MusicPlayer 1')
-			self.player.start()
+		if self.song_playing == False:
+			self.voice = await self.bot.join_voice_channel(summoned_channel)
 			print('Creating background task')
 			self.bot.loop.create_task(ChrisCommands.background_song(self)) #create task to check the current song and change status
 
 		else:
 			print('moving to: ' + str(summoned_channel))
-			await self.bot.move_to(summoned_channel)
+			await self.voice.move_to(summoned_channel)
 
 		return True
 
@@ -163,7 +156,7 @@ class ChrisPlayer:
 	async def add(self, ctx, song : str):
 		"""Plays youtube song."""
 		await self.bot.delete_message(ctx.message)
-		if self.player is None:
+		if self.song_playing == False:
 			success = await ctx.invoke(self.summon)
 			print(success)
 			if not success:
@@ -219,7 +212,8 @@ class ChrisPlayer:
 				await self.bot.say('Youtube mkv container extraction failed')
 				return
 
-		self.player.add(path_opus, song_title)
+		self.list_songs.append(path_opus)
+		self.list_names.append(song_title)
 		await self.bot.say('Added song: ' + str(song_title) + ' by ' + str(ctx.message.author))
 
 	@commands.command(pass_context=True)
@@ -229,13 +223,12 @@ class ChrisPlayer:
 		if self.player is None:
 			print(ctx.message.author.id)
 			await self.bot.say('Nothin to stop')
+
 		elif ctx.message.author.id == '100280813244936192':
-			print('Beginning')
-			self.player.stop()
-			print('Joining')
-			self.player.join() #bugged
-			print('Joined')
+			print('Stopping')
 			#stop self.bot.loop.create_task(ChrisCommands.background_song(self))
+            self.voice.disconnect()
+
 		else:
 			await self.bot.say('Mute and/or vote to skip')
 
@@ -243,16 +236,18 @@ class ChrisPlayer:
 	async def skip(self, ctx):
 		"""Vote to skip song."""
 		await self.bot.delete_message(ctx.message)
-		if self.player is None:
-			await self.bot.say('Player is offline')
+		if self.song_playing == False:
+			await self.bot.say('Nothing is playing')
 
 		else:
-			for already in self.list_skippers:
-				if already == skipper:
+            skipper = ctx.message.author.id
+			for already in self.list_skippers: #check if de voter hasnt voted already
+				if already == skipper: #
 					await self.bot.say('Cant skip twice')
 					return
 
-			self.list_skippers.append(skipper)
+			self.list_skippers.append(skipper)  #add the id of de voter to the list
+
 			skipper_channel = self.voice.channel
 			print(skipper_channel)
 			skipper_members = self.voice.server.members
