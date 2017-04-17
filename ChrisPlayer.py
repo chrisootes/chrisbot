@@ -24,10 +24,10 @@ class ChrisPlayer:
 	def __init__(self, bot):
 		self.bot = bot
 		self.voice = voice
+        self.song_playing = False
 		self.list_skippers = []
 		self.list_songs = []
 		self.list_names = []
-        self.song_playing = False
 
 	async def background_song(self):
 		song_old = False
