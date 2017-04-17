@@ -118,7 +118,7 @@ class ChrisPlayer:
                         packet = stream.read(packet_size)
 
                         if header > 2:
-                            voice.play_audio(packet, encode=False)
+                            self.voice.play_audio(packet, encode=False)
 
                         else:
                             print('Header ' + str(header))
